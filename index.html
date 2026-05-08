@@ -261,6 +261,33 @@
     });
 
     render();
-  </script>
+  <script>
+  const images = [
+    "image1.png",
+  ];
+
+  let i = 0;
+  const img     = document.getElementById('img');
+  const counter = document.getElementById('counter');
+  const prev    = document.getElementById('prev');
+  const next    = document.getElementById('next');
+
+  function show(index) {
+    img.src = images[index];
+    img.alt = images[index];
+    counter.textContent = images.length > 1 ? `${index + 1} / ${images.length}` : '';
+    prev.disabled = true; // nothing to the left
+  }
+
+  next.addEventListener('click', () => {
+    window.location.href = '/deshou/0/';
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') window.location.href = '/deshou/0/';
+  });
+
+  show(0);
+</script>
 </body>
 </html>
