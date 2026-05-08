@@ -117,33 +117,6 @@
   });
 
   show(0);
-<script>
-  const images = [
-    "image1.png",
-  ];
-
-  let i = 0;
-  const img     = document.getElementById('img');
-  const counter = document.getElementById('counter');
-  const prev    = document.getElementById('prev');
-  const next    = document.getElementById('next');
-
-  function show(index) {
-    img.src = images[index];
-    img.alt = images[index];
-    counter.textContent = images.length > 1 ? `${index + 1} / ${images.length}` : '';
-    next.disabled = true; // nothing to the right
-  }
-
-  prev.addEventListener('click', () => {
-    window.location.href = '/deshou/';
-  });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') window.location.href = '/deshou/';
-  });
-
-  show(0);
 </script>
 </body>
 </html>
