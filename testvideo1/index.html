@@ -43,22 +43,11 @@
       justify-content: center;
       position: relative;
     }
-    #still {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      border-radius: 4px;
-      display: block;
-    }
     #anim {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
       border-radius: 4px;
-      display: none;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
     }
     #replay-btn {
       display: none;
@@ -91,15 +80,13 @@
 <div class="stage">
   <button class="nav-btn" id="prev">&#8249;</button>
   <div class="frame">
-    <img id="still" src="testvideo1.png" alt="comic page"/>
-    <video id="anim" src="testvideo1.mp4" muted playsinline></video>
+    <video id="anim" src="testvideo1.mp4" muted playsinline preload="auto"></video>
     <button id="replay-btn" title="Replay">&#8635;</button>
   </div>
   <button class="nav-btn" id="next">&#8250;</button>
 </div>
 
 <script>
-  const still     = document.getElementById('still');
   const anim      = document.getElementById('anim');
   const replayBtn = document.getElementById('replay-btn');
   const prev      = document.getElementById('prev');
@@ -112,12 +99,14 @@
     if (e.key === 'ArrowRight') window.location.href = '/deshou/';
   });
 
-  // After 3 seconds: swap still image → video
-  setTimeout(() => {
-    still.style.display = 'none';
-    anim.style.display  = 'block';
-    anim.play();
-  }, 1000);
+  // Wait for video to load its first frame, then pause on it
+  anim.addEventListener('loadeddata', () => {
+    anim.currentTime = 0;
+    // After 1 second, play
+    setTimeout(() => {
+      anim.play();
+    }, 1000);
+  });
 
   // When video ends: show replay button
   anim.addEventListener('ended', () => {
