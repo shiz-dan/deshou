@@ -104,18 +104,28 @@
     img.src = images[index];
     img.alt = images[index];
     counter.textContent = images.length > 1 ? `${index + 1} / ${images.length}` : '';
-    prev.disabled = index === 0;
     next.disabled = index === images.length - 1;
+    prev.disabled = false;  // always allow going back
   }
-
-  prev.addEventListener('click', () => { if (i > 0) show(--i); });
-  next.addEventListener('click', () => { if (i < images.length - 1) show(++i); });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft'  && i > 0)               show(--i);
-    if (e.key === 'ArrowRight' && i < images.length-1) show(++i);
+  
+  prev.addEventListener('click', () => {
+    if (i > 0) show(--i);
+    else window.location.href = '/deshou/';
   });
-
+  
+  next.addEventListener('click', () => {
+    if (i < images.length - 1) show(++i);
+    // else window.location.href = '/deshou/1/';  ← uncomment when /1/ exists
+  });
+  
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') {
+      if (i > 0) show(--i);
+      else window.location.href = '/deshou/';
+    }
+    if (e.key === 'ArrowRight' && i < images.length - 1) show(++i);
+  });
+  
   show(0);
 </script>
 </body>
