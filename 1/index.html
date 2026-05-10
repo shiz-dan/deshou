@@ -105,7 +105,7 @@
     img.alt = images[index];
     counter.textContent = images.length > 1 ? `${index + 1} / ${images.length}` : '';
     next.disabled = index === images.length - 1;
-    prev.disabled = false;  // always allow going back
+    prev.disabled = index === 0;  // ← was: false
   }
   
   prev.addEventListener('click', () => {
