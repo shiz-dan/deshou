@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deshou</title>
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --arrow-idle: rgba(255,255,255,0.08);
+      --arrow-hover: rgba(255,255,255,0.18);
+      --arrow-icon: rgba(255,255,255,0.55);
+      --arrow-icon-hover: rgba(255,255,255,0.95);
+      --accent: #c8a96e;
+      --disabled: rgba(255,255,255,0.06);
+      --disabled-icon: rgba(255,255,255,0.12);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ─── subtle grain overlay ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ─── title bar ─── */
+    header {
+      width: 100%;
+      padding: 18px 0 10px;
+      text-align: center;
+      letter-spacing: 0.25em;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.7;
+    }
+
+    /* ─── main reader area ─── */
+    .reader {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 20px 0 40px;
+      gap: 0;
+    }
+
+    /* ─── navigation arrows ─── */
+    .nav-btn {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--arrow-idle);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      text-decoration: none;
+      margin: 0 18px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .nav-btn:hover:not(.disabled) {
+      background: var(--arrow-hover);
+      border-color: rgba(255,255,255,0.2);
+      transform: scale(1.08);
+    }
+
+    .nav-btn:active:not(.disabled) {
+      transform: scale(0.96);
+    }
+
+    .nav-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: var(--arrow-icon);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.2s;
+    }
+
+    .nav-btn:hover:not(.disabled) svg {
+      stroke: var(--arrow-icon-hover);
+    }
+
+    /* ─── DISABLE ARROWS HERE ─── */
+    /* To disable left arrow:  add class "disabled" to #btn-prev  */
+    /* To disable right arrow: add class "disabled" to #btn-next  */
+    /* Or set: const DISABLE_PREV = true; / const DISABLE_NEXT = true; below */
+
+    .nav-btn.disabled {
+      background: var(--disabled);
+      border-color: transparent;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .nav-btn.disabled svg {
+      stroke: var(--disabled-icon);
+    }
+
+    /* ─── page image container ─── */
+    .page-wrap {
+      position: relative;
+      max-width: min(700px, calc(100vw - 160px));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04),
+        0 8px 60px rgba(0,0,0,0.8),
+        0 2px 12px rgba(0,0,0,0.6);
+    }
+
+    .page-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 90vh;
+      object-fit: contain;
+    }
+
+    /* loading shimmer */
+    .page-wrap.loading::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── page number ─── */
+    footer {
+      padding-bottom: 28px;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+
+    /* ─── keyboard hint ─── */
+    .hint {
+      position: fixed;
+      bottom: 14px;
+      right: 18px;
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.1);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* ─── responsive: shrink arrows on small screens ─── */
+    @media (max-width: 520px) {
+      .nav-btn { width: 40px; height: 40px; margin: 0 8px; }
+      .nav-btn svg { width: 16px; height: 16px; }
+      .page-wrap { max-width: calc(100vw - 110px); }
+    }
+  </style>
+</head>
+<body>
+
+
+
+<div class="reader">
+
+  <!-- LEFT / PREV arrow -->
+  <a class="nav-btn" id="btn-prev" href="#" aria-label="Previous page">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </a>
+
+  <!-- Comic page image -->
+  <div class="page-wrap loading" id="page-wrap">
+    <img id="comic-img" src="" alt="Comic page" />
+  </div>
+
+  <!-- RIGHT / NEXT arrow -->
+  <a class="nav-btn" id="btn-next" href="#" aria-label="Next page">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </a>
+
+</div>
+
+<footer id="page-label"></footer>
+<div class="hint">← → keys to navigate</div>
+
+<script>
+  // ─────────────────────────────────────────────
+  //  CONFIG — edit these two lines as needed
+  // ─────────────────────────────────────────────
+  const DISABLE_PREV = false;   // set true to hide/disable left arrow
+  const DISABLE_NEXT = false;   // set true to hide/disable right arrow
+  // ─────────────────────────────────────────────
+
+  (function () {
+    const base = '/deshou/';   // adjust if your repo root differs
+
+    // Parse current page number from URL
+    // Expects paths like /deshou/3/ or /deshou/3/index.html
+    const pathParts = window.location.pathname
+      .replace(/\/index\.html$/, '')
+      .replace(/\/$/, '')
+      .split('/');
+
+    const lastPart = pathParts[pathParts.length - 1];
+    const currentPage = parseInt(lastPart, 10);
+    const isValidPage = !isNaN(currentPage) && currentPage > 0;
+
+    const prevPage = isValidPage ? currentPage - 1 : null;
+    const nextPage = isValidPage ? currentPage + 1 : null;
+
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const img     = document.getElementById('comic-img');
+    const wrap    = document.getElementById('page-wrap');
+    const label   = document.getElementById('page-label');
+
+    // ── Set up prev arrow ──
+    if (DISABLE_PREV || !isValidPage || prevPage < 1) {
+      btnPrev.classList.add('disabled');
+      btnPrev.removeAttribute('href');
+    } else {
+      btnPrev.href = base + prevPage + '/';
+    }
+
+    // ── Set up next arrow ──
+    if (DISABLE_NEXT || !isValidPage) {
+      btnNext.classList.add('disabled');
+      btnNext.removeAttribute('href');
+    } else {
+      btnNext.href = base + nextPage + '/';
+    }
+
+    // ── Load page image ──
+    if (isValidPage) {
+      // Image is expected at the same folder: e.g. /deshou/3/page.png
+      // Change the filename below if yours differs
+      const imgSrc = base + currentPage + '/page3.png';
+
+      img.onload = () => wrap.classList.remove('loading');
+      img.onerror = () => {
+        wrap.classList.remove('loading');
+        img.alt = 'Page image not found: ' + imgSrc;
+      };
+      img.src = imgSrc;
+
+      label.textContent = 'Page ' + currentPage;
+    } else {
+      wrap.classList.remove('loading');
+      img.alt = 'Invalid page URL';
+    }
+
+    // ── Keyboard navigation ──
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft'  && !btnPrev.classList.contains('disabled')) {
+        window.location.href = btnPrev.href;
+      }
+      if (e.key === 'ArrowRight' && !btnNext.classList.contains('disabled')) {
+        window.location.href = btnNext.href;
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
