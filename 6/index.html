@@ -222,7 +222,7 @@
   //  CONFIG — edit these two lines as needed
   // ─────────────────────────────────────────────
   const DISABLE_PREV = false;   // set true to hide/disable left arrow
-  const DISABLE_NEXT = false;   // set true to hide/disable right arrow
+  const DISABLE_NEXT = true;   // set true to hide/disable right arrow
   // ─────────────────────────────────────────────
 
   (function () {
@@ -268,7 +268,7 @@
     if (isValidPage) {
       // Image is expected at the same folder: e.g. /deshou/3/page.png
       // Change the filename below if yours differs
-      const imgSrc = base + currentPage + '/page.png';
+      const imgSrc = base + currentPage + '/pagesix.png';
 
       img.onload = () => wrap.classList.remove('loading');
       img.onerror = () => {
